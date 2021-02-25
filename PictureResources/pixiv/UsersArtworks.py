@@ -9,6 +9,7 @@
 -------------------------------------
 """
 
+import os
 import hashlib
 import json
 import logging
@@ -58,12 +59,13 @@ def scrape_page(url):
     return browser.page_source
 
 
-def save_img(url):
+def save_img(url, ID):
     """
     Save image
 
     Args:
         url: URL
+        ID: user ID
     Returns:
         None
     """
@@ -77,7 +79,11 @@ def save_img(url):
     img = res_img.content  # 获取原图资源
     fmd5 = hashlib.md5(img)
     img_name = fmd5.hexdigest()
-    with open('74184/{}.jpg'.format(img_name), 'wb') as f:
+
+    if not os.path.exists(ID):
+        os.makedirs(ID)
+
+    with open('{}/{}.jpg'.format(ID, img_name), 'wb') as f:
         f.write(img)
 
 
@@ -92,6 +98,6 @@ if __name__ == "__main__":
         url_list.append(domain + key)
         print(domain + key)
         try:
-            save_img(domain + key)
+            save_img(domain + key, ID)
         except:
             pass
