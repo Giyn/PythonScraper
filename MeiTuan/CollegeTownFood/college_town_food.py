@@ -25,6 +25,7 @@ INDEX_URL = 'https://gz.meituan.com/meishi/b1184/pn{page}/'
 TIME_OUT = 30
 TOTAL_PAGE = 12
 option = ChromeOptions()
+option.add_argument("--disable-blink-features=AutomationControlled")
 option.add_experimental_option('excludeSwitches', ['enable-automation'])
 option.add_experimental_option('useAutomationExtension', False)
 browser = webdriver.Chrome(options=option)
