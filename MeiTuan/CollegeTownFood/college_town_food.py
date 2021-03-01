@@ -2,9 +2,9 @@
 """
 Created on Mon Aug 17 22:22:13 2020
 
-Auther: Giyn
+Author: Giyn
 GitHub: https://github.com/Giyn
-Email: giyn.jy@gmail.com
+Email : giyn.jy@gmail.com
 
 """
 
@@ -19,7 +19,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ChromeOptions
 from selenium import webdriver
 
-
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 INDEX_URL = 'https://gz.meituan.com/meishi/b1184/pn{page}/'
 TIME_OUT = 30
@@ -30,7 +29,6 @@ option.add_experimental_option('excludeSwitches', ['enable-automation'])
 option.add_experimental_option('useAutomationExtension', False)
 browser = webdriver.Chrome(options=option)
 wait = WebDriverWait(browser, TIME_OUT)
-
 
 MONGO_CONNECTION_STRING = 'mongodb://localhost:27017'  # MongoDB connection string
 MONGO_DB_NAME = 'food'  # database name
@@ -58,6 +56,15 @@ def scrape_page(url, condition, locator):
                                 {'source': 'Object.defineProperty(navigator, "webdriver", {get: () => undefined})'})
         time.sleep(1)
         browser.get(url)
+
+        # login
+        browser.find_elements_by_xpath('//*[@id="login-email"]')[0].send_keys('phonenumber')
+        time.sleep(1)
+        browser.find_elements_by_xpath('//*[@id="login-password"]')[0].send_keys('password')
+        time.sleep(1)
+        browser.find_element_by_xpath("//*[@id='J-normal-form']//input[@type='submit']").click()
+        time.sleep(1)
+
         wait.until(condition(locator))
     except TimeoutException:
         logging.error('error occurred while scraping %s', url, exc_info=True)
@@ -86,7 +93,8 @@ def parse_index():
     Returns:
         generator
     """
-    elements = browser.find_elements_by_xpath('/html/body/div/section/div/div[2]/div[2]/div[1]/ul/li/div[1]/a')
+    elements = browser.find_elements_by_xpath(
+        '/html/body/div/section/div/div[2]/div[2]/div[1]/ul/li/div[1]/a')
     for element in elements:
         url = element.get_attribute('href')
         yield url
@@ -120,7 +128,8 @@ def parse_detail():
     except:
         name = '无'
     try:
-        star = browser.find_element_by_xpath("/html/body/div/section/div/div[2]/div[1]/div[2]/p").text[0]
+        star = \
+        browser.find_element_by_xpath("/html/body/div/section/div/div[2]/div[1]/div[2]/p").text[0]
     except:
         star = '无'
     if star == '暂':
@@ -131,12 +140,14 @@ def parse_detail():
     except:
         per_capita_consumption = '无'
     try:
-        address = browser.find_element_by_xpath("/html/body/div/section/div/div[2]/div[1]/div[3]/p[1]").text.strip(
+        address = browser.find_element_by_xpath(
+            "/html/body/div/section/div/div[2]/div[1]/div[3]/p[1]").text.strip(
             '地址：')
     except:
         address = '无'
     try:
-        telephone = browser.find_element_by_xpath("/html/body/div/section/div/div[2]/div[1]/div[3]/p[2]").text.strip(
+        telephone = browser.find_element_by_xpath(
+            "/html/body/div/section/div/div[2]/div[1]/div[3]/p[2]").text.strip(
             '电话：')
     except:
         telephone = '无'
@@ -164,8 +175,10 @@ def parse_detail():
     except:
         cover = '无'
 
-    return {"NAME": name, "STAR": star, "PER_CAPITA_CONSUMPTION": per_capita_consumption, "ADDRESS": address,
-            "TELEPHONE": telephone, "BUSINESS_HOURS": business_hours, "RECOMMENDED_DISHES": recommended_dishes,
+    return {"NAME": name, "STAR": star, "PER_CAPITA_CONSUMPTION": per_capita_consumption,
+            "ADDRESS": address,
+            "TELEPHONE": telephone, "BUSINESS_HOURS": business_hours,
+            "RECOMMENDED_DISHES": recommended_dishes,
             "REVIEW_PEOPLE": review_people, "URL": url, "COVER": cover}
 
 
@@ -192,5 +205,6 @@ if __name__ == "__main__":
         for detail_url in list(detail_urls):
             scrape_detail(detail_url)
             detail_data = parse_detail()
-            save_to_MongoDB(detail_data)
-            logging.info('save data %s', detail_data)
+            print(detail_data)
+            # save_to_MongoDB(detail_data)
+            logging.info('save data %s', detail_data)
