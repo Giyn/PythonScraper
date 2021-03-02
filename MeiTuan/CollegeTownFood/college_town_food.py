@@ -57,13 +57,16 @@ def scrape_page(url, condition, locator):
         time.sleep(1)
         browser.get(url)
 
-        # login
-        browser.find_elements_by_xpath('//*[@id="login-email"]')[0].send_keys('phonenumber')
-        time.sleep(1)
-        browser.find_elements_by_xpath('//*[@id="login-password"]')[0].send_keys('password')
-        time.sleep(1)
-        browser.find_element_by_xpath("//*[@id='J-normal-form']//input[@type='submit']").click()
-        time.sleep(1)
+        try:
+            # login
+            browser.find_elements_by_xpath('//*[@id="login-email"]')[0].send_keys('phonenumber')
+            time.sleep(1)
+            browser.find_elements_by_xpath('//*[@id="login-password"]')[0].send_keys('password')
+            time.sleep(1)
+            browser.find_element_by_xpath("//*[@id='J-normal-form']//input[@type='submit']").click()
+            time.sleep(1)
+        except IndexError:
+            logging.info('logged')
 
         wait.until(condition(locator))
     except TimeoutException:
@@ -81,7 +84,7 @@ def scrape_index(page):
     """
     url = INDEX_URL.format(page=page)
     scrape_page(url, condition=EC.visibility_of_all_elements_located,
-                locator=(By.XPATH, '/html/body/div/section/div/div[2]/div[2]/div[1]/ul/li'))
+                locator=(By.XPATH, '//ul[@class="list-ul"]/li'))
 
 
 def parse_index():
@@ -89,12 +92,11 @@ def parse_index():
     Get the url of each business
 
     Args:
-        None
+
     Returns:
         generator
     """
-    elements = browser.find_elements_by_xpath(
-        '/html/body/div/section/div/div[2]/div[2]/div[1]/ul/li/div[1]/a')
+    elements = browser.find_elements_by_xpath('//*[@id="app"]//ul[@class="list-ul"]//a')
     for element in elements:
         url = element.get_attribute('href')
         yield url
@@ -110,7 +112,7 @@ def scrape_detail(url):
         None
     """
     scrape_page(url, condition=EC.visibility_of_element_located,
-                locator=(By.XPATH, '/html/body/div/section/div/div[2]/div[1]/div[@class="name"]'))
+                locator=(By.XPATH, "//div[@class='d-left']/div[@class='name']"))
 
 
 def parse_detail():
@@ -123,55 +125,44 @@ def parse_detail():
         data
     """
     try:
-        name = browser.find_element_by_xpath(
-            "/html/body/div[1]/section/div/div[2]/div[1]/div[1]").text.strip('食品安全档案').strip()
+        name = browser.find_element_by_xpath("//div[@class='d-left']/div[@class='name']").text.strip('食品安全档案').strip()
     except:
         name = '无'
     try:
         star = \
-        browser.find_element_by_xpath("/html/body/div/section/div/div[2]/div[1]/div[2]/p").text[0]
+        browser.find_element_by_xpath("//div[@class='score clear']//p").text[0]
     except:
         star = '无'
     if star == '暂':
         star = '无'
     try:
-        per_capita_consumption = browser.find_element_by_xpath(
-            "/html/body/div/section/div/div[2]/div[1]/div[2]/p/span").text.strip().strip('人均')
+        per_capita_consumption = browser.find_element_by_xpath("//div[@class='score clear']//p/span").text.strip().strip('人均')
     except:
         per_capita_consumption = '无'
     try:
-        address = browser.find_element_by_xpath(
-            "/html/body/div/section/div/div[2]/div[1]/div[3]/p[1]").text.strip(
-            '地址：')
+        address = browser.find_element_by_xpath("//div[@class='address']/p[1]").text.strip('地址：')
     except:
         address = '无'
     try:
-        telephone = browser.find_element_by_xpath(
-            "/html/body/div/section/div/div[2]/div[1]/div[3]/p[2]").text.strip(
-            '电话：')
+        telephone = browser.find_element_by_xpath("//div[@class='address']/p[2]").text.strip('电话：')
     except:
         telephone = '无'
     try:
-        business_hours = browser.find_element_by_xpath(
-            "/html/body/div/section/div/div[2]/div[1]/div[3]/p[3]").text.strip('营业时间：')
+        business_hours = browser.find_element_by_xpath("//div[@class='address']/p[3]").text.strip('营业时间：')
     except:
         business_hours = '无'
     try:
-        raw_recommended_dishes = browser.find_element_by_xpath(
-            "/html/body/div/section/div/div[3]/div[1]/div[2]/div/ul").text
+        raw_recommended_dishes = browser.find_element_by_xpath("//div[@class='recommend']/div/ul").text
         recommended_dishes = ','.join(re.findall(u"[\u4e00-\u9fa5]+", raw_recommended_dishes))
     except:
         recommended_dishes = '无'
     try:
-        review_people = browser.find_element_by_xpath(
-            "/html/body/div/section/div/div[3]/div[1]/div[3]/div[1]").text.strip(
-            '条网友点评').strip('质量排序时间排序').strip()
+        review_people = browser.find_element_by_xpath("//div[@class='comment']//div[@class='total']").text.strip('条网友点评').strip('质量排序时间排序').strip()
     except:
         review_people = '无'
     url = browser.current_url
     try:
-        cover = browser.find_element_by_xpath(
-            "/html/body/div/section/div/div[2]/div[2]/div/div/img").get_attribute('src')
+        cover = browser.find_element_by_xpath("//div[@class='big']/div[@class='imgbox']/img").get_attribute('src')
     except:
         cover = '无'
 
