@@ -57,14 +57,18 @@ def scrape_page(url, condition, locator):
         time.sleep(1)
         browser.get(url)
 
+        # scroll to the bottom
+        browser.execute_script('window.scrollTo(0, document.body.scrollHeight)')
+
         try:
             # login
-            browser.find_elements_by_xpath('//*[@id="login-email"]')[0].send_keys('phonenumber')
-            time.sleep(1)
-            browser.find_elements_by_xpath('//*[@id="login-password"]')[0].send_keys('password')
-            time.sleep(1)
-            browser.find_element_by_xpath("//*[@id='J-normal-form']//input[@type='submit']").click()
-            time.sleep(1)
+            if browser.title == '登录 | 美团网':
+                browser.find_elements_by_xpath('//*[@id="login-email"]')[0].send_keys('13680918266')
+                time.sleep(1)
+                browser.find_elements_by_xpath('//*[@id="login-password"]')[0].send_keys('xjyxjy0723')
+                time.sleep(1)
+                browser.find_element_by_xpath("//*[@id='J-normal-form']//input[@type='submit']").click()
+                time.sleep(1)
         except IndexError:
             logging.info('logged')
 
