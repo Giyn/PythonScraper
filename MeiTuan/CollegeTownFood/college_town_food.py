@@ -196,6 +196,5 @@ if __name__ == "__main__":
         for detail_url in list(detail_urls):
             scrape_detail(detail_url)
             detail_data = parse_detail()
-            print(detail_data)
-            # save_to_MongoDB(detail_data)
+            save_to_MongoDB(detail_data)
             logging.info('save data %s', detail_data)
