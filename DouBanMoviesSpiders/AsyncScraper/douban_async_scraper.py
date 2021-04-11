@@ -12,15 +12,12 @@
 import asyncio
 import json
 import logging
-import random
 import re
 
 import aiohttp
 from faker import Faker
 from lxml import etree
 from motor.motor_asyncio import AsyncIOMotorClient
-
-from Utils import IP
 
 # MongoDB 相关配置参数
 MONGO_CONNECTION_STRING = 'mongodb://localhost:27017'
