@@ -9,15 +9,17 @@
 """
 __author__ = 'Giyn'
 
-import multiprocessing
-import requests
 import logging
-import time
+import multiprocessing
 import os
-from lxml import etree
-from faker import Faker
+import time
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')  # log information settings
+import requests
+from faker import Faker
+from lxml import etree
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s: %(message)s')  # log information settings
 
 fake = Faker()
 
@@ -64,7 +66,8 @@ def parse_html(html):
 
     """
     doc = etree.HTML(html)
-    raw_images_list = doc.xpath("/html/body/div//div[@class='desktops column span-24 archive']/div//img/@src")
+    raw_images_list = doc.xpath(
+        "/html/body/div//div[@class='desktops column span-24 archive']/div//img/@src")
     images_list = []
     for each_pic in raw_images_list:
         images_list.append(each_pic.replace('.295x184_q100.png', ''))
