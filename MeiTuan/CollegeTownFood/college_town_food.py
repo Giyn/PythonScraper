@@ -64,9 +64,9 @@ def scrape_page(url, condition, locator):
         try:
             # login
             if browser.title == '登录 | 美团网':
-                browser.find_elements_by_xpath('//*[@id="login-email"]')[0].send_keys('13680918266')
+                browser.find_elements_by_xpath('//*[@id="login-email"]')[0].send_keys('phoneNumber')
                 time.sleep(1)
-                browser.find_elements_by_xpath('//*[@id="login-password"]')[0].send_keys('xjyxjy0723')
+                browser.find_elements_by_xpath('//*[@id="login-password"]')[0].send_keys('password')
                 time.sleep(1)
                 browser.find_element_by_xpath("//*[@id='J-normal-form']//input[@type='submit']").click()
                 time.sleep(1)
