@@ -5,10 +5,14 @@ Created on Thu Aug  6 21:38:15 2020
 @author: Giyn
 """
 
-import requests
-from lxml import etree  # 解析HTML
-import pandas as pd
 import os
+
+import pandas as pd
+import requests
+from fake_useragent import UserAgent
+from lxml import etree  # 解析HTML
+
+ua = UserAgent()
 
 
 def get_html(url):
@@ -26,11 +30,8 @@ def get_html(url):
         HTML页面
 
     """
-    headers = {
-        'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
-
     try:
-        html = requests.get(url, headers=headers)
+        html = requests.get(url, headers={'User-Agent': ua.chrome})
         html.encoding = html.apparent_encoding
         if html.status_code == 200:
             print("获取HTML页面成功！")
@@ -67,11 +68,8 @@ def parse_html(html):
     for li in lis:
         # 下面的XPath路径前面都要加上. 表示从li这个节点开始
         name = li.xpath(".//a/span[@class='title'][1]/text()")[0]  # 获取到的列表第0个元素才是电影名字
-        director_actor = li.xpath(".//div[@class='bd']/p/text()[1]")[0].replace(' ', '').replace(
-            '\n', '').replace('/', '').replace('\xa0', '')  # 去除字符串中的多余字符
-        info = li.xpath(".//div[@class='bd']/p/text()[2]")[0].replace(' ', '').replace('\n',
-                                                                                       '').replace(
-            '\xa0', '')  # 去除字符串中的多余字符
+        director_actor = li.xpath(".//div[@class='bd']/p/text()[1]")[0].replace(' ', '').replace('\n', '').replace('/', '').replace('\xa0', '')  # 去除字符串中的多余字符
+        info = li.xpath(".//div[@class='bd']/p/text()[2]")[0].replace(' ', '').replace('\n', '').replace('\xa0', '')  # 去除字符串中的多余字符
         rating_score = li.xpath(".//span[@class='rating_num']/text()")[0]
         rating_num = li.xpath(".//div[@class='star']/span[4]/text()")[0]
         introduce = li.xpath(".//p[@class='quote']/span/text()")
