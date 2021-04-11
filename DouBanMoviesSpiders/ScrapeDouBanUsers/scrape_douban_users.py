@@ -20,7 +20,7 @@ ua = UserAgent()
 def get_html(url):
     """
     @功能: 获取页面
-    @参数: URL链接、代理IP列表
+    @参数: URL链接
     @返回: 页面内容
     """
     while True:
