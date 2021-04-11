@@ -8,16 +8,17 @@ Email : giyn.jy@gmail.com
 
 """
 
-import pymongo
 import logging
-import time
 import re
+import time
+
+import pymongo
+from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver import ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver import ChromeOptions
-from selenium import webdriver
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 INDEX_URL = 'https://gz.meituan.com/meishi/b1184/pn{page}/'
@@ -129,18 +130,19 @@ def parse_detail():
         data
     """
     try:
-        name = browser.find_element_by_xpath("//div[@class='d-left']/div[@class='name']").text.strip('食品安全档案').strip()
+        name = browser.find_element_by_xpath(
+            "//div[@class='d-left']/div[@class='name']").text.strip('食品安全档案').strip()
     except:
         name = '无'
     try:
-        star = \
-        browser.find_element_by_xpath("//div[@class='score clear']//p").text[0]
+        star = browser.find_element_by_xpath("//div[@class='score clear']//p").text[0]
     except:
         star = '无'
     if star == '暂':
         star = '无'
     try:
-        per_capita_consumption = browser.find_element_by_xpath("//div[@class='score clear']//p/span").text.strip().strip('人均')
+        per_capita_consumption = browser.find_element_by_xpath(
+            "//div[@class='score clear']//p/span").text.strip().strip('人均')
     except:
         per_capita_consumption = '无'
     try:
@@ -152,21 +154,26 @@ def parse_detail():
     except:
         telephone = '无'
     try:
-        business_hours = browser.find_element_by_xpath("//div[@class='address']/p[3]").text.strip('营业时间：')
+        business_hours = browser.find_element_by_xpath("//div[@class='address']/p[3]").text.strip(
+            '营业时间：')
     except:
         business_hours = '无'
     try:
-        raw_recommended_dishes = browser.find_element_by_xpath("//div[@class='recommend']/div/ul").text
+        raw_recommended_dishes = browser.find_element_by_xpath(
+            "//div[@class='recommend']/div/ul").text
         recommended_dishes = ','.join(re.findall(u"[\u4e00-\u9fa5]+", raw_recommended_dishes))
     except:
         recommended_dishes = '无'
     try:
-        review_people = browser.find_element_by_xpath("//div[@class='comment']//div[@class='total']").text.strip('条网友点评').strip('质量排序时间排序').strip()
+        review_people = browser.find_element_by_xpath(
+            "//div[@class='comment']//div[@class='total']").text.strip('条网友点评').strip(
+            '质量排序时间排序').strip()
     except:
         review_people = '无'
     url = browser.current_url
     try:
-        cover = browser.find_element_by_xpath("//div[@class='big']/div[@class='imgbox']/img").get_attribute('src')
+        cover = browser.find_element_by_xpath(
+            "//div[@class='big']/div[@class='imgbox']/img").get_attribute('src')
     except:
         cover = '无'
 
