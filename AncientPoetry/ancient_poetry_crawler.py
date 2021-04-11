@@ -9,13 +9,14 @@
 -------------------------------------
 """
 
-import requests
+import json
 import logging
 import time
-import json
-from lxml import etree
-from faker import Faker
 from collections import OrderedDict
+
+import requests
+from faker import Faker
+from lxml import etree
 
 # log information settings
 logging.basicConfig(level=logging.INFO,
@@ -62,9 +63,7 @@ def parse_and_save_poetry(html):
     """
     doc = etree.HTML(html)
     for i in range(1, 51):
-        text = doc.xpath(
-            "/html[@id='html']/body/div[@class='main3']/div[@class='left']/div[@class='sons']/div[@class='cont'][{}]/a/text()".format(
-                str(i)))
+        text = doc.xpath("/html[@id='html']/body/div[@class='main3']/div[@class='left']/div[@class='sons']/div[@class='cont'][{}]/a/text()".format(str(i)))
         content = text[0]
         author = text[1].split("《")[0]
         from_ = "《" + text[1].split("《")[1]
