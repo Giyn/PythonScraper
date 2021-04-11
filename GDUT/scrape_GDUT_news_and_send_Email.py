@@ -16,13 +16,13 @@ from email.header import Header
 from email.mime.text import MIMEText
 
 import requests
-from faker import Faker
+from fake_useragent import UserAgent
 from lxml import etree
 
 # log information settings
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s: %(message)s')
-fake = Faker()
+ua = UserAgent()
 
 
 def get_html(url):
@@ -40,7 +40,7 @@ def get_html(url):
     while True:
         try:
             time.sleep(4.12)
-            res = requests.get(url, headers={'User-Agent': fake.user_agent()})
+            res = requests.get(url, headers={'User-Agent': ua.chrome})
             if res.status_code == 200:
                 return res
         except Exception as e:
@@ -56,21 +56,12 @@ def parse_html(text):
     news_list = []
 
     for i in range(1, news_num + 1):
-        news_title = doc.xpath(
-            '/html/body/form//div[@id="ContentPlaceHolder1_ListView1_ItemPlaceHolderContainer"]/p[{}]/a/@title'.format(
-                str(i)))[0]
-        news_url = 'http://news.gdut.edu.cn/' + doc.xpath(
-            '/html/body/form//div[@id="ContentPlaceHolder1_ListView1_ItemPlaceHolderContainer"]/p[{}]/a/@href'.format(
-                str(i)))[0].replace('./', '')
-        news_from = doc.xpath(
-            '/html/body/form//div[@id="ContentPlaceHolder1_ListView1_ItemPlaceHolderContainer"]/p[{}]/span/@title'.format(
-                str(i)))[0]
-        news_date = doc.xpath(
-            '/html/body/form//div[@id="ContentPlaceHolder1_ListView1_ItemPlaceHolderContainer"]/p[{}]/span[2]/text()'.format(
-                str(i)))[0].strip().replace(']', '').replace(u'\xa0', u' ')
+        news_title = doc.xpath('/html/body/form//div[@id="ContentPlaceHolder1_ListView1_ItemPlaceHolderContainer"]/p[{}]/a/@title'.format(str(i)))[0]
+        news_url = 'http://news.gdut.edu.cn/' + doc.xpath('/html/body/form//div[@id="ContentPlaceHolder1_ListView1_ItemPlaceHolderContainer"]/p[{}]/a/@href'.format(str(i)))[0].replace('./', '')
+        news_from = doc.xpath('/html/body/form//div[@id="ContentPlaceHolder1_ListView1_ItemPlaceHolderContainer"]/p[{}]/span/@title'.format(str(i)))[0]
+        news_date = doc.xpath('/html/body/form//div[@id="ContentPlaceHolder1_ListView1_ItemPlaceHolderContainer"]/p[{}]/span[2]/text()'.format(str(i)))[0].strip().replace(']', '').replace(u'\xa0', u' ')
 
-        news = str({"title": news_title, "url": news_url, "from": news_from,
-                "date": news_date})
+        news = str({"title": news_title, "url": news_url, "from": news_from, "date": news_date})
 
         news_list.append(news)
 
