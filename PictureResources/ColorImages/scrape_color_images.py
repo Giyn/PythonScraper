@@ -10,10 +10,11 @@
 """
 __author__ = 'Giyn'
 
-import aiohttp
 import asyncio
 import hashlib
 import logging
+
+import aiohttp
 
 URL = 'https://setu.awsl.ee/api/setu!'
 CONCURRENCY = 200  # 并发限制
