@@ -5,13 +5,16 @@ Created on Sun May 10 20:40:48 2020
 @author: Giyn
 """
 
-from lxml import etree
-import requests
-import random
+import json
 import re
 import time
-import json
+
 import pandas as pd
+import requests
+from fake_useragent import UserAgent
+from lxml import etree
+
+ua = UserAgent()
 
 
 def get_html(url):
@@ -20,26 +23,10 @@ def get_html(url):
     @参数: URL链接、代理IP列表
     @返回: 页面内容
     """
-    failed = 1  # 请求失败参数
-    headers = [
-        {
-            'User-Agent': "Mozilla/5.0 (X11; U; Linux x86_64; zh-CN; rv:1.9.2.10) Gecko/20100922 Ubuntu/10.10 (maverick) Firefox/3.6.10"},
-        {
-            'User-Agent': "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36 OPR/26.0.1656.60"},
-        {
-            'User-Agent': "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E; QQBrowser/7.0.3698.400)"},
-        {
-            'User-Agent': "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; SV1; QQDownload 732; .NET4.0C; .NET4.0E; SE 2.X MetaSr 1.0)"},
-        {
-            'User-Agent': "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko"},
-        {
-            'User-Agent': "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Maxthon/4.4.3.4000 Chrome/30.0.1599.101 Safari/537.36"}
-    ]
-
     while True:
         try:
             time.sleep(1)
-            res = requests.get(url=url, headers=random.choice(headers))
+            res = requests.get(url=url, headers={'User-Agent': ua.chrome})
             if res.status_code == 200:
                 return res.text
         except:
@@ -54,8 +41,8 @@ def crawl_movies(num):
     """
     movies_lists = []
     for i in range(num):
-        url = "https://movie.douban.com/j/new_search_subjects?sort=U&range=0,10&tags=%E7%94%B5%E5%BD%B1&start=" + str(
-            i * 20)  # 每个电影列表的URL(一个页面20部电影)
+        # 每个电影列表的URL(一个页面20部电影)
+        url = "https://movie.douban.com/j/new_search_subjects?sort=U&range=0,10&tags=%E7%94%B5%E5%BD%B1&start=" + str(i * 20)
         while True:
             data = get_html(url)  # 获取电影列表页面
             dicts = json.loads(data)  # 把数据转换成json格式
@@ -66,6 +53,7 @@ def crawl_movies(num):
             print("成功获取20部电影的网页!")
         except:
             print("获取资源失败")
+
     return movies_lists
 
 
@@ -84,11 +72,9 @@ def crawl_users(movies_lists):
             html = etree.HTML(text)  # 解析每部电影的页面
 
             # 每部电影下面的5个用户评论
-            for j in range(5):
-                user_url = html.xpath("//div[{}]/div/h3/span[2]/a/@href".format(j + 1))[
-                    0]  # 电影页面下的用户主页URL
-                rating_out_raw = \
-                    html.xpath("//div[{}]/div/h3/span[2]/span[2]/@class".format(j + 1))[0]
+            for j in range(1, 6):
+                user_url = html.xpath("//div[@id='hot-comments']/div[{}]//span[@class='comment-info']/a/@href".format(j))[0]  # 电影页面下的用户主页URL
+                rating_out_raw = html.xpath("//div[{}]/div/h3/span[@class='comment-info']/span[2]/@class".format(j))[0]
 
                 try:
                     user_id = user_url.split('/')[-2]  # 电影下的用户ID
@@ -96,20 +82,17 @@ def crawl_users(movies_lists):
                     user_id = None
 
                 user_reviews_url = user_url + 'reviews'  # 用户主页的评论页面URL
-                user_reviews_html = get_html(user_reviews_url, proxies)  # 获取用户主页评论页面
+                user_reviews_html = get_html(user_reviews_url)  # 获取用户主页评论页面
                 user_reviews_data = etree.HTML(user_reviews_html)  # 解析用户主页评论页面
 
                 # 进入用户主页评论页面进行爬取
-                for k in range(10):
+                for k in range(1, 11):
                     try:
-                        movie_in_id_raw = user_reviews_data.xpath(
-                            "//div[3]/div[3]/div/div[1]/div[1]/div[{}]/div/a/@href".format(k + 1))[
-                            0]
-                        movie_in_id = re.search(r'\d+', movie_in_id_raw).group(
-                            0)  # 提取用户主页评论的第k部电影ID
+                        movie_in_id_raw = user_reviews_data.xpath("//div[@class='article']/div/div[{}]//a[@class='subject-img']/@href".format(k))[0]
+                        # 提取用户主页评论的第k部电影ID
+                        movie_in_id = re.search(r'\d+', movie_in_id_raw).group(0)
 
-                        rating_in_raw = user_reviews_data.xpath(
-                            "//div[{}]/div/header/span[1]/@class".format(k + 1))[0]
+                        rating_in_raw = user_reviews_data.xpath("//div[@class='article']/div/div[{}]//header/span[1]/@class".format(k))[0]
                         rating_in = re.search(r'\d+', rating_in_raw).group(0)
                         rating_in = float(rating_in[0] + '.' + rating_in[1])  # 用户主页评论页面的评分
 
