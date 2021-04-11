@@ -9,11 +9,12 @@
 -------------------------------------
 """
 
+import smtplib
+from email.header import Header
+from email.mime.text import MIMEText
+
 import requests
 from lxml import etree
-import smtplib
-from email.mime.text import MIMEText
-from email.header import Header
 
 
 def get_html(url):
@@ -34,23 +35,16 @@ def get_html(url):
 
 
 def get_url():
-    headers = {
-        'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"
-    }
+    headers = {'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)"}
     url = "http://old.gdut.edu.cn/"
     r = requests.get(url, headers=headers)
     html = etree.HTML(r.text)
 
-    link1 = html.xpath(
-        "/html/body/div[@class='box-c3']/div[@class='news-s']/div[@class='news-zv']/ul/li/a/@href")
-    link2 = html.xpath(
-        "/html/body/div[@class='box-c']/div[@class='news-s']/div[@class='news-zv']/ul/li/a/@href")
-    link3 = html.xpath(
-        "/html/body/div[@class='box-c3']/div[@class='news-g']/div[@class='news-zv2']/ul/li/a/@href")
-    link4 = html.xpath(
-        "/html/body/div[@class='box-c']/div[@class='news-g']/div[@class='news-zv2']/ul/li/a/@href")
-    link5 = html.xpath(
-        "/html/body/div[@class='box-c']/div[@class='news-x']/div[@class='news-zv3']/ul/li/a/@href")
+    link1 = html.xpath("/html/body/div[@class='box-c3']/div[@class='news-s']/div[@class='news-zv']/ul/li/a/@href")
+    link2 = html.xpath("/html/body/div[@class='box-c']/div[@class='news-s']/div[@class='news-zv']/ul/li/a/@href")
+    link3 = html.xpath("/html/body/div[@class='box-c3']/div[@class='news-g']/div[@class='news-zv2']/ul/li/a/@href")
+    link4 = html.xpath("/html/body/div[@class='box-c']/div[@class='news-g']/div[@class='news-zv2']/ul/li/a/@href")
+    link5 = html.xpath("/html/body/div[@class='box-c']/div[@class='news-x']/div[@class='news-zv3']/ul/li/a/@href")
 
     return link1, link2, link3, link4, link5
 
@@ -60,12 +54,10 @@ def parse_html(html):
 
     html = etree.HTML(html)
 
-    gdut_news = html.xpath(
-        "/html/body/div[@class='box-c3']/div[@class='news-s']/div[@class='news-zv']/ul/li/a/@title")
+    gdut_news = html.xpath("/html/body/div[@class='box-c3']/div[@class='news-s']/div[@class='news-zv']/ul/li/a/@title")
     gdut_media = html.xpath("/html//div[6]/div[1]/div[2]/ul/li/a/@title")
     bwcx_fdsz = html.xpath("/html//div[5]/div[2]/div[2]/ul/li/a/@title")
-    Academic_Notice = html.xpath(
-        "/html/body/div[6]/div[2]/div[2]/ul/li/a/@title")
+    Academic_Notice = html.xpath("/html/body/div[6]/div[2]/div[2]/ul/li/a/@title")
     stu_work = html.xpath("/html/body/div[6]/div[3]/div[2]/ul/li/a/@title")
 
     print("解析页面成功！")
@@ -76,7 +68,6 @@ def parse_html(html):
         bwcx_fdsz[i] = bwcx_fdsz[i] + " 详情点击：" + get_url()[2][i]
         Academic_Notice[i] = Academic_Notice[i] + " 详情点击：" + get_url()[3][i]
         stu_work[i] = stu_work[i] + " 详情点击：" + get_url()[4][i]
-
 
     all_news = '\n'.join(gdut_news) + '\n' + '\n'.join(
         gdut_media) + '\n' + '\n'.join(bwcx_fdsz) + '\n' + '\n'.join(
