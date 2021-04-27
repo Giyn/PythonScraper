@@ -1,0 +1,5 @@
+pandas
+requests
+fake_useragent
+lxml
+pyppeteer
