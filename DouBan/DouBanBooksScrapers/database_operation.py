@@ -25,8 +25,8 @@ conn = pymysql.connect(
 
 cursor = conn.cursor()  # 得到一个可以执行SQL语句的光标对象
 
-# 建表
-create_table_sql = """
+# 建书籍表
+create_books_table_sql = """
     CREATE TABLE `douban_book` (
     `book_name` VARCHAR(20) NOT NULL UNIQUE,
     `author` VARCHAR(20) NOT NULL,
@@ -43,9 +43,33 @@ create_table_sql = """
     )
 """
 
-if __name__ == '__main__':
+# 建用户表
+create_users_table_sql = """
+    CREATE TABLE `douban_book_users` (
+    `id` VARCHAR(40) NOT NULL UNIQUE,
+    `nickname` VARCHAR(40),
+    `read_num` INTEGER,
+    `read_book_and_score` LONGBLOB
+    )
+"""
+
+
+def main(sql: str):
+    """
+
+    主函数
+
+    Args:
+
+    Returns:
+
+    """
     try:
-        cursor.execute(create_table_sql)
+        cursor.execute(sql)
     except Exception as e:
         logging.error(e)
         conn.rollback()
+
+
+if __name__ == '__main__':
+    main(create_users_table_sql)
