@@ -49,7 +49,7 @@ create_users_table_sql = """
     `id` VARCHAR(40) NOT NULL UNIQUE,
     `nickname` VARCHAR(40),
     `read_num` INTEGER,
-    `read_book_and_score` LONGBLOB
+    `read_book_and_score` TEXT
     )
 """
 
