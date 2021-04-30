@@ -38,6 +38,15 @@ cursor = conn.cursor()  # 得到一个可以执行SQL语句的光标对象
 
 
 def get_user_urls_list():
+    """
+
+    获取用户 URL 列表
+
+    Args:
+
+    Returns:
+
+    """
     USERS_list = []
     with open('user_urls.txt', mode='r', encoding='utf-8') as file:
         lines = file.readlines()
