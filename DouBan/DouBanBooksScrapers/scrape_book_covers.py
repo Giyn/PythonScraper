@@ -38,7 +38,7 @@ cursor = conn.cursor()  # 得到一个可以执行SQL语句的光标对象
 select_sql = 'SELECT book_name, cover_url FROM douban_book'
 
 cover_url_num = cursor.execute(select_sql)
-covers_url_tuple = cursor.fetchall()[2762:]
+covers_url_tuple = cursor.fetchall()
 
 
 async def scrape_api(cover_tuple):
